@@ -53,7 +53,13 @@ function errorAdvice(run: ColumnRun): string | null {
   }
 }
 
-function CopyButton({ text, size = "icon-sm" }: { text: string; size?: "icon-sm" | "sm" }) {
+function CopyButton({
+  text,
+  size = "icon-sm",
+}: {
+  text: string;
+  size?: "icon-sm" | "sm";
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -174,7 +180,12 @@ export function ResponseColumn({
           {advice && (
             <p className="text-muted-foreground mt-2 text-xs">{advice}</p>
           )}
-          <Button variant="outline" size="sm" className="mt-3" onClick={onRerun}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={onRerun}
+          >
             <RotateCw /> Retry
           </Button>
         </div>
@@ -221,7 +232,11 @@ export function ResponseColumn({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon-sm" aria-label="Column actions">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Column actions"
+              >
                 <MoreVertical />
               </Button>
             </DropdownMenuTrigger>

@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchKeyInfo } from "@/lib/openrouter/client";
-import { OpenRouterError, type OpenRouterKeyInfo } from "@/lib/openrouter/types";
+import {
+  OpenRouterError,
+  type OpenRouterKeyInfo,
+} from "@/lib/openrouter/types";
 import { useAppStore } from "@/store/app-store";
 
 /** `sk-or-v1-abc…wxyz` -> `sk-or-v1-••••wxyz` */

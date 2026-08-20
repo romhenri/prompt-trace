@@ -63,9 +63,7 @@ type ModelPickerProps = {
 function formatContext(model: OpenRouterModel): string {
   const length = model.context_length ?? model.top_provider?.context_length;
   if (!length) return "context n/a";
-  return length >= 1000
-    ? `${Math.round(length / 1000)}k ctx`
-    : `${length} ctx`;
+  return length >= 1000 ? `${Math.round(length / 1000)}k ctx` : `${length} ctx`;
 }
 
 function formatPrice(model: OpenRouterModel): string {

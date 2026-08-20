@@ -38,9 +38,7 @@ export function PromptTextarea({
           {label}
           {required && <span className="text-muted-foreground"> *</span>}
         </Label>
-        {hint && (
-          <span className="text-muted-foreground text-xs">{hint}</span>
-        )}
+        {hint && <span className="text-muted-foreground text-xs">{hint}</span>}
       </div>
       <Textarea
         id={id}

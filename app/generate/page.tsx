@@ -412,8 +412,8 @@ function Generate() {
           ) : (
             <p className="text-muted-foreground text-sm">
               Describe the task on the left. The generated prompt streams in
-              here, structured with role, context, instructions, constraints
-              and output format.
+              here, structured with role, context, instructions, constraints and
+              output format.
             </p>
           )}
         </div>

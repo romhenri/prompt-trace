@@ -64,7 +64,9 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-3">
             <ShieldCheck className="size-5 shrink-0 text-emerald-400" />
             <div className="min-w-0">
-              <div className="text-sm font-medium">Key saved in this browser</div>
+              <div className="text-sm font-medium">
+                Key saved in this browser
+              </div>
               <div className="text-muted-foreground font-mono text-xs">
                 {maskKey(apiKey)}
               </div>

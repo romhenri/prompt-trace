@@ -10,7 +10,8 @@ import {
   writeString,
 } from "@/lib/storage";
 
-export type PromptStyle = "system prompt" | "user prompt" | "agent instructions";
+export type PromptStyle =
+  "system prompt" | "user prompt" | "agent instructions";
 
 /** Prefilled state handed to /compare by the generator or by history. */
 export interface ComparePreset {

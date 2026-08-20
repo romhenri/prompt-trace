@@ -48,7 +48,8 @@ describe("writeWithQuotaRetry", () => {
   it("drops the oldest entries until the write fits", () => {
     // Oldest-first ids are at the end; only two entries ever fit.
     const write = vi.fn((items: HistoryEntry[]) => {
-      if (items.length > 2) throw new DOMException("full", "QuotaExceededError");
+      if (items.length > 2)
+        throw new DOMException("full", "QuotaExceededError");
     });
     const kept = writeWithQuotaRetry(
       [entry("a", 3), entry("b", 2), entry("c", 1)],
@@ -59,7 +60,8 @@ describe("writeWithQuotaRetry", () => {
 
   it("gives up and returns an empty list rather than looping forever", () => {
     const write = vi.fn((items: HistoryEntry[]) => {
-      if (items.length > 0) throw new DOMException("full", "QuotaExceededError");
+      if (items.length > 0)
+        throw new DOMException("full", "QuotaExceededError");
     });
     expect(writeWithQuotaRetry([entry("a", 1)], write)).toEqual([]);
   });
@@ -68,6 +70,8 @@ describe("writeWithQuotaRetry", () => {
     const write = vi.fn(() => {
       throw new TypeError("something else broke");
     });
-    expect(() => writeWithQuotaRetry([entry("a", 1)], write)).toThrow(TypeError);
+    expect(() => writeWithQuotaRetry([entry("a", 1)], write)).toThrow(
+      TypeError,
+    );
   });
 });

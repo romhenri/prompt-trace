@@ -9,12 +9,7 @@ import {
   type TokenUsage,
 } from "./openrouter/types";
 
-export type RunStatus =
-  | "queued"
-  | "streaming"
-  | "done"
-  | "error"
-  | "cancelled";
+export type RunStatus = "queued" | "streaming" | "done" | "error" | "cancelled";
 
 export interface ColumnRun {
   modelId: string;
@@ -80,25 +75,19 @@ export function useModelRuns() {
 
   const queueDelta = useCallback(
     (modelId: string, text: string) => {
-      pending.current.set(
-        modelId,
-        (pending.current.get(modelId) ?? "") + text,
-      );
+      pending.current.set(modelId, (pending.current.get(modelId) ?? "") + text);
       frame.current ??= requestAnimationFrame(flush);
     },
     [flush],
   );
 
-  const patch = useCallback(
-    (modelId: string, changes: Partial<ColumnRun>) => {
-      setRuns((prev) =>
-        prev.map((run) =>
-          run.modelId === modelId ? { ...run, ...changes } : run,
-        ),
-      );
-    },
-    [],
-  );
+  const patch = useCallback((modelId: string, changes: Partial<ColumnRun>) => {
+    setRuns((prev) =>
+      prev.map((run) =>
+        run.modelId === modelId ? { ...run, ...changes } : run,
+      ),
+    );
+  }, []);
 
   const runOne = useCallback(
     async (modelId: string, request: RunRequest) => {

@@ -13,12 +13,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { KeyForm, maskKey } from "@/components/key-form";
 import { fetchKeyInfo } from "@/lib/openrouter/client";
-import { OpenRouterError, type OpenRouterKeyInfo } from "@/lib/openrouter/types";
+import {
+  OpenRouterError,
+  type OpenRouterKeyInfo,
+} from "@/lib/openrouter/types";
 import { useAppStore } from "@/store/app-store";
 
 type Check =
-  | { ok: true; info: OpenRouterKeyInfo }
-  | { ok: false; message: string };
+  { ok: true; info: OpenRouterKeyInfo } | { ok: false; message: string };
 
 /**
  * Mounted per key, so switching keys or reopening the dialog re-checks from
@@ -32,7 +34,8 @@ function KeyStatusLine({ apiKey }: { apiKey: string }) {
     fetchKeyInfo(apiKey, controller.signal)
       .then((info) => setCheck({ ok: true, info }))
       .catch((error: unknown) => {
-        if (error instanceof OpenRouterError && error.kind === "aborted") return;
+        if (error instanceof OpenRouterError && error.kind === "aborted")
+          return;
         setCheck({
           ok: false,
           message:
@@ -52,13 +55,16 @@ function KeyStatusLine({ apiKey }: { apiKey: string }) {
     );
   }
 
-  if (!check.ok) return <span className="text-destructive">{check.message}</span>;
+  if (!check.ok)
+    return <span className="text-destructive">{check.message}</span>;
 
   const { info } = check;
   return (
     <>
       {info.label || "unlabelled key"} · used ${info.usage.toFixed(2)}
-      {info.limit === null ? " · no spend limit" : ` of $${info.limit.toFixed(2)}`}
+      {info.limit === null
+        ? " · no spend limit"
+        : ` of $${info.limit.toFixed(2)}`}
     </>
   );
 }

@@ -69,10 +69,14 @@ export function toJson(data: ComparisonExport): string {
         output: run.text,
         error: run.error,
         metrics: {
-          timeToFirstTokenMs: run.ttftMs === null ? null : Math.round(run.ttftMs),
+          timeToFirstTokenMs:
+            run.ttftMs === null ? null : Math.round(run.ttftMs),
           totalMs: run.totalMs === null ? null : Math.round(run.totalMs),
           usage: run.usage,
-          estimatedCostUsd: estimateCost(data.byId.get(run.modelId), run.usage ?? undefined),
+          estimatedCostUsd: estimateCost(
+            data.byId.get(run.modelId),
+            run.usage ?? undefined,
+          ),
         },
       })),
     },

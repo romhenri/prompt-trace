@@ -13,8 +13,7 @@ export const OPENROUTER_BASE = "https://openrouter.ai/api/v1";
 function headers(apiKey: string): HeadersInit {
   return {
     Authorization: `Bearer ${apiKey}`,
-    "HTTP-Referer":
-      typeof window === "undefined" ? "" : window.location.origin,
+    "HTTP-Referer": typeof window === "undefined" ? "" : window.location.origin,
     "X-Title": "Prompt Forge",
     "Content-Type": "application/json",
   };
@@ -153,7 +152,10 @@ export async function streamChatCompletion({
 
   if (!response.ok) throw await toError(response);
   if (!response.body) {
-    throw new OpenRouterError("network", "OpenRouter returned no response body.");
+    throw new OpenRouterError(
+      "network",
+      "OpenRouter returned no response body.",
+    );
   }
 
   const reader = response.body.getReader();

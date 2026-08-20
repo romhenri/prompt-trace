@@ -3,7 +3,9 @@ import { parseSseBuffer } from "./sse";
 
 describe("parseSseBuffer", () => {
   it("returns one payload per complete event", () => {
-    const { events, rest } = parseSseBuffer('data: {"a":1}\n\ndata: {"a":2}\n\n');
+    const { events, rest } = parseSseBuffer(
+      'data: {"a":1}\n\ndata: {"a":2}\n\n',
+    );
     expect(events).toEqual(['{"a":1}', '{"a":2}']);
     expect(rest).toBe("");
   });
@@ -13,7 +15,7 @@ describe("parseSseBuffer", () => {
     expect(first.events).toEqual(['{"a":1}']);
     expect(first.rest).toBe('data: {"a":');
 
-    const second = parseSseBuffer(first.rest + '2}\n\n');
+    const second = parseSseBuffer(first.rest + "2}\n\n");
     expect(second.events).toEqual(['{"a":2}']);
     expect(second.rest).toBe("");
   });

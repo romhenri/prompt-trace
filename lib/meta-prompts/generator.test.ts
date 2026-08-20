@@ -35,9 +35,9 @@ describe("buildGeneratorPrompt", () => {
 
 describe("extractFencedPrompt", () => {
   it("returns just the contents of a closed fence", () => {
-    expect(extractFencedPrompt("blah\n```text\nthe prompt\n```\ntrailing")).toBe(
-      "the prompt",
-    );
+    expect(
+      extractFencedPrompt("blah\n```text\nthe prompt\n```\ntrailing"),
+    ).toBe("the prompt");
   });
 
   it("returns what has arrived so far while the fence is still open", () => {
