@@ -1,5 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import { HISTORY_LIMIT, addEntry, writeWithQuotaRetry } from "./history";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  HISTORY_LIMIT,
+  addEntry,
+  recordEntry,
+  writeWithQuotaRetry,
+} from "./history";
 import type { HistoryEntry } from "./history";
 
 function entry(id: string, createdAt: number): HistoryEntry {
@@ -73,5 +78,43 @@ describe("writeWithQuotaRetry", () => {
     expect(() => writeWithQuotaRetry([entry("a", 1)], write)).toThrow(
       TypeError,
     );
+  });
+});
+
+describe("recordEntry", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    localStorage.clear();
+  });
+
+  it("does not ask the caller to warn while there is room", () => {
+    expect(recordEntry(entry("a", 1)).shouldWarn).toBe(false);
+    expect(recordEntry(entry("b", 2)).shouldWarn).toBe(false);
+  });
+
+  it("asks the caller to warn only the first time entries are shed", async () => {
+    // Fresh module so the once-per-session flag starts unset.
+    vi.resetModules();
+    const { recordEntry: record } = await import("./history");
+
+    const setItem = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation((_key, value) => {
+        if (String(value).length > 200) {
+          throw new DOMException("full", "QuotaExceededError");
+        }
+      });
+
+    try {
+      const big = (id: string): HistoryEntry => ({
+        ...entry(id, 1),
+        outputs: { text: "x".repeat(400) },
+      });
+      expect(record(big("a")).shouldWarn).toBe(true);
+      expect(record(big("b")).shouldWarn).toBe(false);
+      expect(record(big("c")).shouldWarn).toBe(false);
+    } finally {
+      setItem.mockRestore();
+    }
   });
 });

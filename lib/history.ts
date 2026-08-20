@@ -53,10 +53,6 @@ export function loadHistory(): HistoryEntry[] {
   return Array.isArray(entries) ? entries : [];
 }
 
-/**
- * Saves an entry and reports whether entries had to be dropped to make room,
- * so the UI can warn once.
- */
 export function saveHistory(entries: HistoryEntry[]): {
   entries: HistoryEntry[];
   dropped: boolean;
@@ -65,4 +61,18 @@ export function saveHistory(entries: HistoryEntry[]): {
     writeJson(STORAGE_KEYS.history, items),
   );
   return { entries: written, dropped: written.length < entries.length };
+}
+
+/** Warn about a full localStorage once per session, not on every save. */
+let warnedAboutQuota = false;
+
+/**
+ * Appends one entry to the stored history. Returns true the first time
+ * entries had to be shed to make room, so the caller warns exactly once.
+ */
+export function recordEntry(entry: HistoryEntry): { shouldWarn: boolean } {
+  const { dropped } = saveHistory(addEntry(loadHistory(), entry));
+  if (!dropped || warnedAboutQuota) return { shouldWarn: false };
+  warnedAboutQuota = true;
+  return { shouldWarn: true };
 }

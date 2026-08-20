@@ -53,12 +53,15 @@ function errorAdvice(run: ColumnRun): string | null {
   }
 }
 
-function CopyButton({
+/** Copy-to-clipboard with a brief confirmation tick. */
+export function CopyButton({
   text,
   size = "icon-sm",
+  label = "Copy output",
 }: {
   text: string;
   size?: "icon-sm" | "sm";
+  label?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -72,8 +75,8 @@ function CopyButton({
     <Button
       variant="ghost"
       size={size}
-      aria-label="Copy output"
-      title="Copy output"
+      aria-label={label}
+      title={label}
       disabled={text === ""}
       onClick={() => {
         void navigator.clipboard.writeText(text).then(() => setCopied(true));

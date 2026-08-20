@@ -4,9 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
-  Check,
   Columns3,
-  Copy,
   Pencil,
   RotateCw,
   Sparkles,
@@ -16,6 +14,7 @@ import { toast } from "sonner";
 import { KeyGate } from "@/components/key-gate";
 import { ModelPicker } from "@/components/model-picker";
 import { PromptTextarea } from "@/components/prompt-textarea";
+import { CopyButton } from "@/components/response-column";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { addEntry, loadHistory, saveHistory } from "@/lib/history";
+import { recordEntry } from "@/lib/history";
 import {
   buildGeneratorPrompt,
   extractFencedPrompt,
@@ -81,7 +80,6 @@ function Generate() {
   const [edited, setEdited] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const controller = useRef<AbortController | null>(null);
   const buffer = useRef("");
@@ -96,12 +94,6 @@ function Generate() {
       if (frame.current !== null) cancelAnimationFrame(frame.current);
     };
   }, []);
-
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 1500);
-    return () => clearTimeout(timer);
-  }, [copied]);
 
   /** What the user acts on: their edit if they made one, else the model's. */
   const prompt = useMemo(
@@ -159,26 +151,24 @@ function Generate() {
 
       const generated = extractFencedPrompt(buffer.current);
       if (generated) {
-        const { dropped } = saveHistory(
-          addEntry(loadHistory(), {
-            id: crypto.randomUUID(),
-            tool: "generate",
-            createdAt: Date.now(),
-            inputs: {
-              task,
-              context,
-              outputFormat,
-              constraints,
-              promptStyle,
-              targetModel,
-              generatorModel,
-            },
-            outputs: { prompt: generated },
-            models: [generatorModel],
-            metrics: {},
-          }),
-        );
-        if (dropped) {
+        const { shouldWarn } = recordEntry({
+          id: crypto.randomUUID(),
+          tool: "generate",
+          createdAt: Date.now(),
+          inputs: {
+            task,
+            context,
+            outputFormat,
+            constraints,
+            promptStyle,
+            targetModel,
+            generatorModel,
+          },
+          outputs: { prompt: generated },
+          models: [generatorModel],
+          metrics: {},
+        });
+        if (shouldWarn) {
           toast.warning(
             "History was trimmed to fit your browser's storage limit.",
           );
@@ -197,11 +187,14 @@ function Generate() {
 
   function sendToComparison() {
     if (!prompt) return;
-    setComparePreset(
-      promptStyle === "user prompt"
-        ? { userPrompt: prompt }
-        : { systemPrompt: prompt, userPrompt: "" },
-    );
+    if (promptStyle === "user prompt") {
+      setComparePreset({ userPrompt: prompt });
+    } else {
+      // A system prompt cannot be run on its own, so say what is still needed
+      // rather than landing the user on a disabled Run button.
+      setComparePreset({ systemPrompt: prompt, userPrompt: "" });
+      toast.info("Added as the system prompt. Write a user prompt to run it.");
+    }
     router.push("/compare");
   }
 
@@ -338,19 +331,7 @@ function Generate() {
           <h2 className="flex-1 text-sm font-medium">Generated prompt</h2>
           {prompt && (
             <>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Copy prompt"
-                title="Copy prompt"
-                onClick={() => {
-                  void navigator.clipboard
-                    .writeText(prompt)
-                    .then(() => setCopied(true));
-                }}
-              >
-                {copied ? <Check className="text-emerald-400" /> : <Copy />}
-              </Button>
+              <CopyButton text={prompt} label="Copy prompt" />
               <Button
                 variant="ghost"
                 size="icon-sm"

@@ -178,13 +178,6 @@ export function useModelRuns() {
     for (const controller of controllers.current.values()) controller.abort();
   }, []);
 
-  const clear = useCallback(() => {
-    for (const controller of controllers.current.values()) controller.abort();
-    controllers.current.clear();
-    pending.current.clear();
-    setRuns([]);
-  }, []);
-
   // Leaving the page must not leave streams billing against the user's key.
   useEffect(() => {
     const inFlight = controllers.current;
@@ -197,5 +190,5 @@ export function useModelRuns() {
     (run) => run.status === "queued" || run.status === "streaming",
   );
 
-  return { runs, busy, start, rerun, cancel, cancelAll, clear };
+  return { runs, busy, start, rerun, cancel, cancelAll };
 }

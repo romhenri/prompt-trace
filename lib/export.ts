@@ -46,7 +46,7 @@ export function toMarkdown(data: ComparisonExport): string {
   for (const run of data.runs) {
     const model = data.byId.get(run.modelId);
     lines.push(`## ${model?.name ?? run.modelId}`, "");
-    lines.push(`\`${run.modelId}\` — ${run.status}`, "");
+    lines.push(`\`${run.modelId}\` · ${run.status}`, "");
     lines.push(`_${metricsLine(run, data.byId)}_`, "");
     if (run.error) lines.push(`> Error: ${run.error}`, "");
     if (run.text) lines.push(run.text, "");

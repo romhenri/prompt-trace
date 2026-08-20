@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { downloadText, toJson, toMarkdown } from "@/lib/export";
-import { addEntry, loadHistory, saveHistory } from "@/lib/history";
+import { recordEntry } from "@/lib/history";
 import { useModelCatalog } from "@/lib/openrouter/models";
 import type { ChatMessage } from "@/lib/openrouter/types";
 import { useModelRuns } from "@/lib/use-model-runs";
@@ -63,7 +63,14 @@ function Compare() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [syncScroll, setSyncScroll] = useState(false);
   const [scrollRatio, setScrollRatio] = useState<number | null>(null);
-  const savedRunId = useRef<string | null>(null);
+  /**
+   * Identity and inputs of the run in progress, captured when it starts so a
+   * later edit to the prompt cannot rewrite what history says was run.
+   */
+  const savedRun = useRef<{
+    id: string;
+    inputs: Record<string, string>;
+  } | null>(null);
 
   // Consumed, so a later visit to /compare starts clean.
   useEffect(() => useAppStore.getState().setComparePreset(null), []);
@@ -86,58 +93,64 @@ function Compare() {
     temperatureValid &&
     maxTokensValid;
 
-  function run() {
-    if (!canRun || !apiKey) return;
+  /** The exact same request every column gets, so the comparison is fair. */
+  function buildRequest() {
+    if (!apiKey) return null;
     const messages: ChatMessage[] = [];
     if (systemPrompt.trim()) {
       messages.push({ role: "system", content: systemPrompt });
     }
     messages.push({ role: "user", content: userPrompt });
-
-    savedRunId.current = crypto.randomUUID();
-    start(models, {
+    return {
       apiKey,
       messages,
       temperature: parsedTemperature,
       maxTokens: parsedMaxTokens ?? undefined,
-    });
+    };
+  }
+
+  function run() {
+    const request = canRun ? buildRequest() : null;
+    if (!request) return;
+    savedRun.current = {
+      id: crypto.randomUUID(),
+      inputs: { systemPrompt, userPrompt, temperature, maxTokens },
+    };
+    start(models, request);
   }
 
   // Persist once every column has settled, so metrics are complete.
   useEffect(() => {
-    const id = savedRunId.current;
-    if (!id || runs.length === 0 || busy) return;
-    savedRunId.current = null;
+    const saved = savedRun.current;
+    if (!saved || runs.length === 0 || busy) return;
 
-    const { dropped } = saveHistory(
-      addEntry(loadHistory(), {
-        id,
-        tool: "compare",
-        createdAt: Date.now(),
-        inputs: { systemPrompt, userPrompt, temperature, maxTokens },
-        outputs: {
-          responses: runs.map((r) => ({
-            modelId: r.modelId,
-            text: r.text,
-            status: r.status,
-            error: r.error,
-          })),
-        },
-        models: runs.map((r) => r.modelId),
-        metrics: {
-          perModel: runs.map((r) => ({
-            modelId: r.modelId,
-            ttftMs: r.ttftMs,
-            totalMs: r.totalMs,
-            usage: r.usage,
-          })),
-        },
-      }),
-    );
-    if (dropped) {
+    const { shouldWarn } = recordEntry({
+      id: saved.id,
+      tool: "compare",
+      createdAt: Date.now(),
+      inputs: saved.inputs,
+      outputs: {
+        responses: runs.map((r) => ({
+          modelId: r.modelId,
+          text: r.text,
+          status: r.status,
+          error: r.error,
+        })),
+      },
+      models: runs.map((r) => r.modelId),
+      metrics: {
+        perModel: runs.map((r) => ({
+          modelId: r.modelId,
+          ttftMs: r.ttftMs,
+          totalMs: r.totalMs,
+          usage: r.usage,
+        })),
+      },
+    });
+    if (shouldWarn) {
       toast.warning("History was trimmed to fit your browser's storage limit.");
     }
-  }, [busy, runs, systemPrompt, userPrompt, temperature, maxTokens]);
+  }, [busy, runs]);
 
   const exportData = useMemo(
     () => ({
@@ -329,18 +342,15 @@ function Compare() {
               run={columnRun}
               model={byId.get(columnRun.modelId)}
               onRerun={() => {
-                if (!apiKey) return;
-                const messages: ChatMessage[] = [];
-                if (systemPrompt.trim()) {
-                  messages.push({ role: "system", content: systemPrompt });
-                }
-                messages.push({ role: "user", content: userPrompt });
-                rerun(columnRun.modelId, {
-                  apiKey,
-                  messages,
-                  temperature: parsedTemperature,
-                  maxTokens: parsedMaxTokens ?? undefined,
-                });
+                const request = buildRequest();
+                if (!request) return;
+                // Reuse the run's identity so the rerun updates that history
+                // entry in place instead of being dropped.
+                savedRun.current ??= {
+                  id: crypto.randomUUID(),
+                  inputs: { systemPrompt, userPrompt, temperature, maxTokens },
+                };
+                rerun(columnRun.modelId, request);
               }}
               onCancel={() => cancel(columnRun.modelId)}
               onScroll={syncScroll ? setScrollRatio : undefined}

@@ -45,12 +45,12 @@ ${
     : ""
 }
 Structure the finished prompt with these parts, in this order, using plain headings:
-1. Role and objective — who the model is and what success looks like.
-2. Context — the background it needs, stated as fact.
-3. Instructions — numbered, concrete, ordered steps.
-4. Constraints — hard rules, including what not to do.
-5. Output format — exactly what the response must look like.
-6. Examples — one or two short few-shot examples, but only where they remove real ambiguity. Omit this part entirely if they would not.
+1. Role and objective: who the model is and what success looks like.
+2. Context: the background it needs, stated as fact.
+3. Instructions: numbered, concrete, ordered steps.
+4. Constraints: hard rules, including what not to do.
+5. Output format: exactly what the response must look like.
+6. Examples: one or two short few-shot examples, but only where they remove real ambiguity. Omit this part entirely if they would not.
 
 Rules for your reply:
 - Reply with the finished prompt and nothing else.

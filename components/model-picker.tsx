@@ -39,7 +39,11 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 
 const ALL_PROVIDERS = "__all__";
-/** The list is a few hundred models long; render only what a user can scan. */
+/**
+ * The catalog runs to several hundred models. Rendering them all makes the
+ * popover crawl, so cap the list and tell the user when it is truncated
+ * instead of hiding the rest silently.
+ */
 const MAX_VISIBLE = 80;
 
 type ModelPickerProps = {
@@ -113,7 +117,7 @@ export function ModelPicker(props: ModelPickerProps) {
     [models],
   );
 
-  const visible = useMemo(() => {
+  const { visible, matchCount } = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const matches = models.filter((model) => {
       if (provider !== ALL_PROVIDERS && providerOf(model.id) !== provider) {
@@ -128,12 +132,11 @@ export function ModelPicker(props: ModelPickerProps) {
 
     // Favorites pinned to the top, then alphabetical by display name.
     const starred = new Set(favorites);
-    return matches
-      .sort((a, b) => {
-        const byStar = Number(starred.has(b.id)) - Number(starred.has(a.id));
-        return byStar !== 0 ? byStar : a.name.localeCompare(b.name);
-      })
-      .slice(0, MAX_VISIBLE);
+    const sorted = matches.sort((a, b) => {
+      const byStar = Number(starred.has(b.id)) - Number(starred.has(a.id));
+      return byStar !== 0 ? byStar : a.name.localeCompare(b.name);
+    });
+    return { visible: sorted.slice(0, MAX_VISIBLE), matchCount: sorted.length };
   }, [models, query, provider, favorites]);
 
   function isSelected(modelId: string) {
@@ -305,12 +308,17 @@ export function ModelPicker(props: ModelPickerProps) {
             </CommandList>
           </Command>
 
-          {atMax && (
+          {atMax ? (
             <p className="text-muted-foreground border-t p-2 text-xs">
               Maximum of {props.mode === "multi" ? props.max : 0} models
               reached. Remove one to add another.
             </p>
-          )}
+          ) : matchCount > MAX_VISIBLE ? (
+            <p className="text-muted-foreground border-t p-2 text-xs">
+              Showing {MAX_VISIBLE} of {matchCount} matches. Search or filter by
+              provider to narrow it down.
+            </p>
+          ) : null}
         </PopoverContent>
       </Popover>
 

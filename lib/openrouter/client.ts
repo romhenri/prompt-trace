@@ -10,9 +10,13 @@ import {
 /** The only host this app ever talks to. */
 export const OPENROUTER_BASE = "https://openrouter.ai/api/v1";
 
-function headers(apiKey: string): HeadersInit {
+/**
+ * The headers OpenRouter wants on every call. The catalog is public, so the
+ * key is optional there, but attribution headers still go out.
+ */
+function headers(apiKey?: string): HeadersInit {
   return {
-    Authorization: `Bearer ${apiKey}`,
+    ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
     "HTTP-Referer": typeof window === "undefined" ? "" : window.location.origin,
     "X-Title": "Prompt Forge",
     "Content-Type": "application/json",
@@ -87,10 +91,14 @@ export async function fetchKeyInfo(
 /** The catalog is public, so this works before the user has pasted a key. */
 export async function fetchModels(
   signal?: AbortSignal,
+  apiKey?: string,
 ): Promise<OpenRouterModel[]> {
   let response: Response;
   try {
-    response = await fetch(`${OPENROUTER_BASE}/models`, { signal });
+    response = await fetch(`${OPENROUTER_BASE}/models`, {
+      headers: headers(apiKey),
+      signal,
+    });
   } catch (error) {
     throw toNetworkError(error);
   }
