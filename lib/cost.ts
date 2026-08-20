@@ -30,6 +30,18 @@ export function estimateCost(
   );
 }
 
+/**
+ * True only when the catalog promises both sides cost nothing. Variable
+ * pricing ("-1") and a missing price are not promises of free, so they are
+ * excluded: a "free only" filter must never surface a model that bills.
+ */
+export function isFreeModel(model: OpenRouterModel): boolean {
+  return (
+    pricePerMillion(model.pricing?.prompt) === 0 &&
+    pricePerMillion(model.pricing?.completion) === 0
+  );
+}
+
 /** Sub-cent costs are the common case here, so don't round them away. */
 export function formatUsd(amount: number | null): string {
   if (amount === null) return "n/a";

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { estimateCost, formatUsd, pricePerMillion } from "./cost";
+import {
+  estimateCost,
+  formatUsd,
+  isFreeModel,
+  pricePerMillion,
+} from "./cost";
 import type { OpenRouterModel } from "./openrouter/types";
 
 function model(prompt: string, completion: string): OpenRouterModel {
@@ -83,5 +88,28 @@ describe("formatUsd", () => {
 
   it("shows an em-free placeholder when there is nothing to show", () => {
     expect(formatUsd(null)).toBe("n/a");
+  });
+});
+
+describe("isFreeModel", () => {
+  it("is true only when both sides cost nothing", () => {
+    expect(isFreeModel(model("0", "0"))).toBe(true);
+  });
+
+  it("is false when either side costs something", () => {
+    expect(isFreeModel(model("0", "0.000015"))).toBe(false);
+    expect(isFreeModel(model("0.000003", "0"))).toBe(false);
+  });
+
+  it("is false for variable pricing, which is not a promise of free", () => {
+    expect(isFreeModel(model("-1", "-1"))).toBe(false);
+    expect(isFreeModel(model("-1", "0"))).toBe(false);
+  });
+
+  it("is false when the catalog states no price at all", () => {
+    const noPricing = { ...model("0", "0"), pricing: undefined };
+    expect(
+      isFreeModel(noPricing as unknown as Parameters<typeof isFreeModel>[0]),
+    ).toBe(false);
   });
 });

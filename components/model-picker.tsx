@@ -7,6 +7,7 @@ import {
   ChevronsUpDown,
   RefreshCw,
   Star,
+  Tag,
   X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { pricePerMillion } from "@/lib/cost";
+import { isFreeModel, pricePerMillion } from "@/lib/cost";
 import { providerOf, useModelCatalog } from "@/lib/openrouter/models";
 import type { OpenRouterModel } from "@/lib/openrouter/types";
 import { cn } from "@/lib/utils";
@@ -104,6 +105,7 @@ export function ModelPicker(props: ModelPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [provider, setProvider] = useState(ALL_PROVIDERS);
+  const [freeOnly, setFreeOnly] = useState(false);
 
   const selected = props.mode === "single" ? props.value : null;
   const selectedMany = props.mode === "multi" ? props.value : [];
@@ -123,6 +125,7 @@ export function ModelPicker(props: ModelPickerProps) {
       if (provider !== ALL_PROVIDERS && providerOf(model.id) !== provider) {
         return false;
       }
+      if (freeOnly && !isFreeModel(model)) return false;
       if (!needle) return true;
       return (
         model.id.toLowerCase().includes(needle) ||
@@ -137,7 +140,7 @@ export function ModelPicker(props: ModelPickerProps) {
       return byStar !== 0 ? byStar : a.name.localeCompare(b.name);
     });
     return { visible: sorted.slice(0, MAX_VISIBLE), matchCount: sorted.length };
-  }, [models, query, provider, favorites]);
+  }, [models, query, provider, freeOnly, favorites]);
 
   function isSelected(modelId: string) {
     return props.mode === "single"
@@ -208,6 +211,17 @@ export function ModelPicker(props: ModelPickerProps) {
               </SelectContent>
             </Select>
             <Button
+              variant={freeOnly ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setFreeOnly((on) => !on)}
+              aria-pressed={freeOnly}
+              title="Show only models that cost nothing to run"
+              className="shrink-0"
+            >
+              <Tag className={cn(freeOnly && "text-emerald-400")} />
+              Free
+            </Button>
+            <Button
               variant="ghost"
               size="icon-sm"
               onClick={refresh}
@@ -247,7 +261,11 @@ export function ModelPicker(props: ModelPickerProps) {
                 </div>
               ) : (
                 <>
-                  <CommandEmpty>No models match that search.</CommandEmpty>
+                  <CommandEmpty>
+                    {freeOnly
+                      ? "No free models match that search."
+                      : "No models match that search."}
+                  </CommandEmpty>
                   <CommandGroup>
                     {visible.map((model) => {
                       const starred = favorites.includes(model.id);
