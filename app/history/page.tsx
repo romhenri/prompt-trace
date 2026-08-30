@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STORAGE_KEYS, writeJson } from "@/lib/storage";
+import { PAGE_GUTTER } from "@/lib/layout";
 import { loadHistory, saveHistory, type HistoryEntry } from "@/lib/history";
 import type { ComparePreset, GeneratePreset } from "@/store/app-store";
 import { useAppStore, type PromptStyle } from "@/store/app-store";
@@ -81,7 +82,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-3 py-6 sm:px-6">
+    <main className={`mx-auto w-full max-w-3xl flex-1 py-10 ${PAGE_GUTTER}`}>
       <div className="flex items-center gap-3">
         <h1 className="flex-1 text-lg font-semibold">History</h1>
         {entries && entries.length > 0 && (

@@ -7,6 +7,7 @@ import { Flame, KeyRound, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KeySettingsDialog } from "@/components/key-settings-dialog";
 import { cn } from "@/lib/utils";
+import { PAGE_CONTAINER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 
 const NAV = [
@@ -28,7 +29,7 @@ export function SiteHeader() {
   return (
     <>
       <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-3 sm:px-6">
+        <div className={`flex h-16 items-center gap-3 ${PAGE_CONTAINER}`}>
           <Link
             href="/"
             className="flex shrink-0 items-center gap-2 font-semibold"

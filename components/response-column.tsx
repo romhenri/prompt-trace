@@ -98,7 +98,7 @@ function Metrics({
   const cost = estimateCost(model, run.usage ?? undefined);
 
   return (
-    <dl className="text-muted-foreground grid grid-cols-3 gap-x-2 border-t px-3 py-2 text-[11px]">
+    <dl className="text-muted-foreground grid grid-cols-3 gap-x-3 border-t px-4 py-2.5 text-[11px]">
       <div>
         <dt className="uppercase tracking-wide opacity-70">Latency</dt>
         <dd className="text-foreground font-mono">
@@ -172,7 +172,7 @@ export function ResponseColumn({
         const scrollable = node.scrollHeight - node.clientHeight;
         if (scrollable > 0) onScroll?.(node.scrollTop / scrollable);
       }}
-      className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
+      className="min-h-0 flex-1 overflow-y-auto px-4 py-3"
     >
       {run.error ? (
         <div className="text-sm">
@@ -215,7 +215,7 @@ export function ResponseColumn({
   return (
     <>
       <section className="bg-card flex min-h-[22rem] flex-col overflow-hidden rounded-xl border sm:min-h-0">
-        <header className="flex items-center gap-2 border-b px-3 py-2">
+        <header className="flex items-center gap-2 border-b px-4 py-2.5">
           <span
             className={cn("size-2 shrink-0 rounded-full", status.dot)}
             role="img"

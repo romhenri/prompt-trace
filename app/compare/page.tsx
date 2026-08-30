@@ -28,6 +28,7 @@ import { recordEntry } from "@/lib/history";
 import { useModelCatalog } from "@/lib/openrouter/models";
 import type { ChatMessage } from "@/lib/openrouter/types";
 import { useModelRuns } from "@/lib/use-model-runs";
+import { PAGE_CONTAINER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 import { toast } from "sonner";
 
@@ -167,8 +168,8 @@ function Compare() {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 
   return (
-    <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 px-3 py-5 sm:px-6">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <main className={`flex flex-1 flex-col gap-8 py-8 ${PAGE_CONTAINER}`}>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10">
         <div className="space-y-3">
           <button
             type="button"

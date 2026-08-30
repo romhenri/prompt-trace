@@ -2,6 +2,7 @@
 
 import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PAGE_CONTAINER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 
 /**
@@ -17,7 +18,9 @@ export function NoKeyBanner() {
 
   return (
     <div className="border-b border-amber-500/30 bg-amber-500/10">
-      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2 text-sm sm:px-6">
+      <div
+        className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 py-2.5 text-sm ${PAGE_CONTAINER}`}
+      >
         <KeyRound className="size-4 shrink-0 text-amber-400" />
         <span className="text-amber-200">
           No OpenRouter key set. Nothing can run until you add one.

@@ -5,6 +5,7 @@ import { ArrowRight, Columns3, ShieldCheck, Sparkles } from "lucide-react";
 import { KeyForm, maskKey } from "@/components/key-form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PAGE_GUTTER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 
 const TOOLS = [
@@ -28,7 +29,9 @@ export default function Home() {
   const openSettings = useAppStore((s) => s.openSettings);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+    <main
+      className={`mx-auto w-full max-w-4xl py-12 sm:py-16 ${PAGE_GUTTER}`}
+    >
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         Prompt Forge
       </h1>
@@ -37,7 +40,7 @@ export default function Home() {
         browser against your own OpenRouter key.
       </p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid gap-5 sm:grid-cols-2">
         {TOOLS.map((tool) => (
           <Link
             key={tool.href}
@@ -54,7 +57,7 @@ export default function Home() {
         ))}
       </div>
 
-      <section className="mt-10 rounded-xl border p-5">
+      <section className="mt-10 rounded-xl border p-6">
         {!hydrated ? (
           <div className="space-y-3">
             <Skeleton className="h-5 w-40" />

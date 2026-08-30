@@ -32,6 +32,7 @@ import {
   extractFencedPrompt,
 } from "@/lib/meta-prompts/generator";
 import { streamChatCompletion } from "@/lib/openrouter/client";
+import { PAGE_CONTAINER } from "@/lib/layout";
 import { OpenRouterError } from "@/lib/openrouter/types";
 import { cn } from "@/lib/utils";
 import {
@@ -199,7 +200,9 @@ function Generate() {
   }
 
   return (
-    <main className="mx-auto grid w-full max-w-[1600px] flex-1 gap-5 px-3 py-5 sm:px-6 lg:grid-cols-2">
+    <main
+      className={`grid flex-1 gap-8 py-8 lg:grid-cols-2 lg:gap-12 ${PAGE_CONTAINER}`}
+    >
       <div className="space-y-4">
         <PromptTextarea
           label="Task"
@@ -327,7 +330,7 @@ function Generate() {
       </div>
 
       <section className="flex min-h-[24rem] flex-col overflow-hidden rounded-xl border lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)]">
-        <header className="flex items-center gap-2 border-b px-3 py-2">
+        <header className="flex items-center gap-2 border-b px-4 py-2.5">
           <h2 className="flex-1 text-sm font-medium">Generated prompt</h2>
           {prompt && (
             <>
@@ -355,7 +358,7 @@ function Generate() {
           )}
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {error ? (
             <div className="text-sm">
               <p className="text-destructive flex items-start gap-1.5">
@@ -400,7 +403,7 @@ function Generate() {
         </div>
 
         {prompt && !running && (
-          <footer className="border-t p-3">
+          <footer className="border-t p-4">
             <Button variant="outline" onClick={sendToComparison}>
               <Columns3 /> Send to Comparison
             </Button>
