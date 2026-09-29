@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Columns3, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Columns3,
+  FileUser,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { KeyForm, maskKey } from "@/components/key-form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,6 +27,12 @@ const TOOLS = [
     title: "Prompt Comparison",
     body: "Run one prompt across 2 to 6 models at once, streaming side by side, with latency, tokens and estimated cost per column.",
   },
+  {
+    href: "/ats",
+    icon: FileUser,
+    title: "Resume Scorer",
+    body: "Have 2 to 6 models grade the same resume out of 100, against a job posting or on its own, and see where they disagree.",
+  },
 ];
 
 export default function Home() {
@@ -29,14 +41,12 @@ export default function Home() {
   const openSettings = useAppStore((s) => s.openSettings);
 
   return (
-    <main
-      className={`mx-auto w-full max-w-4xl py-12 sm:py-16 ${PAGE_GUTTER}`}
-    >
+    <main className={`mx-auto w-full max-w-4xl py-12 sm:py-16 ${PAGE_GUTTER}`}>
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         Prompt Forge
       </h1>
       <p className="text-muted-foreground mt-2 max-w-2xl text-sm sm:text-base">
-        Two small tools for working with LLM prompts, running entirely in your
+        Small tools for working with LLM prompts, running entirely in your
         browser against your own OpenRouter key.
       </p>
 
