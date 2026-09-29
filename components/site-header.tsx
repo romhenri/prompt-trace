@@ -13,6 +13,7 @@ import { useAppStore } from "@/store/app-store";
 const NAV = [
   { href: "/generate", label: "Generate" },
   { href: "/compare", label: "Compare" },
+  { href: "/ats", label: "Resume" },
   { href: "/history", label: "History" },
 ];
 
