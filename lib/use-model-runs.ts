@@ -170,6 +170,19 @@ export function useModelRuns() {
     [runOne],
   );
 
+  /** Adds one more column to a set already on screen, leaving the rest alone. */
+  const add = useCallback(
+    (modelId: string, request: RunRequest) => {
+      setRuns((prev) =>
+        prev.some((run) => run.modelId === modelId)
+          ? prev
+          : [...prev, blankRun(modelId)],
+      );
+      void runOne(modelId, request);
+    },
+    [runOne],
+  );
+
   const cancel = useCallback((modelId: string) => {
     controllers.current.get(modelId)?.abort();
   }, []);
@@ -198,5 +211,5 @@ export function useModelRuns() {
     (run) => run.status === "queued" || run.status === "streaming",
   );
 
-  return { runs, busy, start, rerun, cancel, cancelAll, remove };
+  return { runs, busy, start, add, rerun, cancel, cancelAll, remove };
 }

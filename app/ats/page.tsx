@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Play, RotateCw, Square } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { ModelPicker } from "@/components/model-picker";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { buildAtsPrompt, consensus, parseVerdict } from "@/lib/ats";
 import { PAGE_CONTAINER } from "@/lib/layout";
 import { useModelCatalog } from "@/lib/openrouter/models";
-import { useModelRuns } from "@/lib/use-model-runs";
+import { useModelRuns, type RunRequest } from "@/lib/use-model-runs";
 import { useAppStore } from "@/store/app-store";
 
 const MIN_MODELS = 2;
@@ -28,7 +28,7 @@ function Ats() {
   const apiKey = useAppStore((s) => s.apiKey);
   const favorites = useAppStore((s) => s.favorites);
   const { byId } = useModelCatalog();
-  const { runs, busy, start, rerun, cancel, cancelAll, remove } =
+  const { runs, busy, start, add, rerun, cancel, cancelAll, remove } =
     useModelRuns();
 
   const [resume, setResume] = useState("");
@@ -36,6 +36,12 @@ function Ats() {
   const [models, setModels] = useState<string[]>(() =>
     favorites.slice(0, MIN_MODELS),
   );
+  /**
+   * The brief the columns on screen were graded against, captured when the
+   * run started. A model added afterwards gets that same brief, so editing
+   * the resume mid-run cannot leave two columns scoring different text.
+   */
+  const scored = useRef<RunRequest | null>(null);
 
   const canRun =
     resume.trim() !== "" &&
@@ -56,7 +62,24 @@ function Ats() {
 
   function run() {
     const request = canRun ? buildRequest() : null;
-    if (request) start(models, request);
+    if (!request) return;
+    scored.current = request;
+    start(models, request);
+  }
+
+  /** Picker changes after a run add or drop one column instead of restarting. */
+  function changeModels(next: string[]) {
+    setModels(next);
+    const request = scored.current;
+    if (runs.length === 0 || !request) return;
+    for (const modelId of next) {
+      if (!runs.some((run) => run.modelId === modelId)) {
+        add(modelId, request);
+      }
+    }
+    for (const run of runs) {
+      if (!next.includes(run.modelId)) remove(run.modelId);
+    }
   }
 
   const verdicts = useMemo(
@@ -96,7 +119,7 @@ function Ats() {
           <ModelPicker
             mode="multi"
             value={models}
-            onChange={setModels}
+            onChange={changeModels}
             max={MAX_MODELS}
             placeholder="Pick 2 to 6 graders"
           />
@@ -206,7 +229,7 @@ function Ats() {
                 run={columnRun}
                 model={byId.get(columnRun.modelId)}
                 onRerun={() => {
-                  const request = buildRequest();
+                  const request = scored.current ?? buildRequest();
                   if (request) rerun(columnRun.modelId, request);
                 }}
                 onCancel={() => cancel(columnRun.modelId)}
