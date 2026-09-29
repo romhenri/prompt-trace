@@ -9,6 +9,7 @@ import {
   MoreVertical,
   RotateCw,
   Square,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -129,6 +130,7 @@ interface ResponseColumnProps {
   model: OpenRouterModel | undefined;
   onRerun: () => void;
   onCancel: () => void;
+  onRemove: () => void;
   /** Set when sync scroll is on; receives this column's scroll ratio. */
   onScroll?: (ratio: number) => void;
   scrollRatio?: number | null;
@@ -139,6 +141,7 @@ export function ResponseColumn({
   model,
   onRerun,
   onCancel,
+  onRemove,
   onScroll,
   scrollRatio,
 }: ResponseColumnProps) {
@@ -252,6 +255,9 @@ export function ResponseColumn({
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onCancel} disabled={!active}>
                 <Square /> Cancel
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onSelect={onRemove}>
+                <Trash2 /> Remove column
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

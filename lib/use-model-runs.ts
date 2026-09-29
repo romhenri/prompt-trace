@@ -174,6 +174,14 @@ export function useModelRuns() {
     controllers.current.get(modelId)?.abort();
   }, []);
 
+  /** Drops a column entirely, stopping its stream first. */
+  const remove = useCallback((modelId: string) => {
+    controllers.current.get(modelId)?.abort();
+    controllers.current.delete(modelId);
+    pending.current.delete(modelId);
+    setRuns((prev) => prev.filter((run) => run.modelId !== modelId));
+  }, []);
+
   const cancelAll = useCallback(() => {
     for (const controller of controllers.current.values()) controller.abort();
   }, []);
@@ -190,5 +198,5 @@ export function useModelRuns() {
     (run) => run.status === "queued" || run.status === "streaming",
   );
 
-  return { runs, busy, start, rerun, cancel, cancelAll };
+  return { runs, busy, start, rerun, cancel, cancelAll, remove };
 }

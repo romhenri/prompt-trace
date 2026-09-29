@@ -49,7 +49,8 @@ function Compare() {
   // Read once at mount: a preset is initial state, not something to sync.
   const [preset] = useState(() => useAppStore.getState().comparePreset);
   const { byId } = useModelCatalog();
-  const { runs, busy, start, rerun, cancel, cancelAll } = useModelRuns();
+  const { runs, busy, start, rerun, cancel, cancelAll, remove } =
+    useModelRuns();
 
   const [systemPrompt, setSystemPrompt] = useState(preset?.systemPrompt ?? "");
   const [userPrompt, setUserPrompt] = useState(preset?.userPrompt ?? "");
@@ -354,6 +355,14 @@ function Compare() {
                 rerun(columnRun.modelId, request);
               }}
               onCancel={() => cancel(columnRun.modelId)}
+              onRemove={() => {
+                remove(columnRun.modelId);
+                // Also drop it from the picker, so Rerun all does not bring
+                // the column back.
+                setModels((prev) =>
+                  prev.filter((id) => id !== columnRun.modelId),
+                );
+              }}
               onScroll={syncScroll ? setScrollRatio : undefined}
               scrollRatio={syncScroll ? scrollRatio : null}
             />
