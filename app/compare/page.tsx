@@ -27,7 +27,7 @@ import { downloadText, toJson, toMarkdown } from "@/lib/export";
 import { recordEntry } from "@/lib/history";
 import { useModelCatalog } from "@/lib/openrouter/models";
 import type { ChatMessage } from "@/lib/openrouter/types";
-import { useModelRuns } from "@/lib/use-model-runs";
+import { useModelRuns, type RunRequest } from "@/lib/use-model-runs";
 import { PAGE_CONTAINER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 import { toast } from "sonner";
@@ -49,7 +49,7 @@ function Compare() {
   // Read once at mount: a preset is initial state, not something to sync.
   const [preset] = useState(() => useAppStore.getState().comparePreset);
   const { byId } = useModelCatalog();
-  const { runs, busy, start, rerun, cancel, cancelAll, remove } =
+  const { runs, busy, start, add, rerun, cancel, cancelAll, remove } =
     useModelRuns();
 
   const [systemPrompt, setSystemPrompt] = useState(preset?.systemPrompt ?? "");
@@ -73,6 +73,12 @@ function Compare() {
     id: string;
     inputs: Record<string, string>;
   } | null>(null);
+  /**
+   * The request the columns on screen were run with, captured when the run
+   * started. A model added afterwards gets exactly that, so editing the
+   * prompt mid-run cannot leave two columns answering different questions.
+   */
+  const scored = useRef<RunRequest | null>(null);
 
   // Consumed, so a later visit to /compare starts clean.
   useEffect(() => useAppStore.getState().setComparePreset(null), []);
@@ -118,7 +124,23 @@ function Compare() {
       id: crypto.randomUUID(),
       inputs: { systemPrompt, userPrompt, temperature, maxTokens },
     };
+    scored.current = request;
     start(models, request);
+  }
+
+  /** Picker changes after a run add or drop one column instead of restarting. */
+  function changeModels(next: string[]) {
+    setModels(next);
+    const request = scored.current;
+    if (runs.length === 0 || !request) return;
+    for (const modelId of next) {
+      if (!runs.some((columnRun) => columnRun.modelId === modelId)) {
+        add(modelId, request);
+      }
+    }
+    for (const columnRun of runs) {
+      if (!next.includes(columnRun.modelId)) remove(columnRun.modelId);
+    }
   }
 
   // Persist once every column has settled, so metrics are complete.
@@ -217,7 +239,7 @@ function Compare() {
             <ModelPicker
               mode="multi"
               value={models}
-              onChange={setModels}
+              onChange={changeModels}
               max={MAX_MODELS}
               placeholder="Pick 2 to 6 models"
             />
@@ -344,7 +366,7 @@ function Compare() {
               run={columnRun}
               model={byId.get(columnRun.modelId)}
               onRerun={() => {
-                const request = buildRequest();
+                const request = scored.current ?? buildRequest();
                 if (!request) return;
                 // Reuse the run's identity so the rerun updates that history
                 // entry in place instead of being dropped.
