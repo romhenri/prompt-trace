@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Columns3,
   FileUser,
+  MessagesSquare,
   Languages,
   ShieldCheck,
   Sparkles,
@@ -39,6 +40,12 @@ const TOOLS = [
     icon: Languages,
     title: "Backtranslation",
     body: "Send text to another language and back, again and again, across several models, and see what meaning survives each trip.",
+  },
+  {
+    href: "/agents",
+    icon: MessagesSquare,
+    title: "Agent Conversation",
+    body: "Let 2 to 4 models talk to each other for a few rounds, each one answering what the last one said, with a role per agent.",
   },
 ];
 
