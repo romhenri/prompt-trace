@@ -6,6 +6,7 @@ import {
   Columns3,
   FileUser,
   MessagesSquare,
+  Thermometer,
   Languages,
   ShieldCheck,
   Sparkles,
@@ -46,6 +47,12 @@ const TOOLS = [
     icon: MessagesSquare,
     title: "Agent Conversation",
     body: "Let 2 to 4 models talk to each other for a few rounds, each one answering what the last one said, with a role per agent.",
+  },
+  {
+    href: "/temperature",
+    icon: Thermometer,
+    title: "Temperature Sweep",
+    body: "Run one prompt on one model at several temperatures, side by side, and see how far the answer drifts as randomness goes up.",
   },
 ];
 
