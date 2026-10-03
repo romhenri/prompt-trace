@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Columns3,
   FileUser,
+  Languages,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -32,6 +33,12 @@ const TOOLS = [
     icon: FileUser,
     title: "Resume Scorer",
     body: "Have 2 to 6 models grade the same resume out of 100, against a job posting or on its own, and see where they disagree.",
+  },
+  {
+    href: "/backtranslate",
+    icon: Languages,
+    title: "Backtranslation",
+    body: "Send text to another language and back, again and again, across several models, and see what meaning survives each trip.",
   },
 ];
 
