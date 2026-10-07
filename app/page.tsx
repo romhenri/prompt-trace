@@ -7,6 +7,7 @@ import {
   FileUser,
   MessagesSquare,
   Thermometer,
+  Gavel,
   Languages,
   ShieldCheck,
   Sparkles,
@@ -53,6 +54,12 @@ const TOOLS = [
     icon: Thermometer,
     title: "Temperature Sweep",
     body: "Run one prompt on one model at several temperatures, side by side, and see how far the answer drifts as randomness goes up.",
+  },
+  {
+    href: "/judge",
+    icon: Gavel,
+    title: "Judge Brute Force",
+    body: "Give a judge model a requirement, then let a challenger keep rewriting from the feedback until it passes or runs out of rounds.",
   },
 ];
 
