@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Columns3,
   FileUser,
+  FlaskConical,
   MessagesSquare,
   Thermometer,
   Gavel,
@@ -30,6 +31,12 @@ const TOOLS = [
     icon: Columns3,
     title: "Prompt Comparison",
     body: "Run one prompt across 2 to 6 models at once, streaming side by side, with latency, tokens and estimated cost per column.",
+  },
+  {
+    href: "/experiment",
+    icon: FlaskConical,
+    title: "Prompt Experimentation",
+    body: "Write 2 to 5 variants of one prompt and run them all on the same model, side by side, to see what each change does.",
   },
   {
     href: "/ats",
