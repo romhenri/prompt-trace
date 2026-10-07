@@ -26,6 +26,8 @@ export interface ColumnRun {
 
 export interface RunRequest {
   apiKey: string;
+  /** Model to call when the column key is not a model id, e.g. a prompt variant. */
+  model?: string;
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
@@ -102,7 +104,7 @@ export function useModelRuns() {
       try {
         await streamChatCompletion({
           apiKey: request.apiKey,
-          model: modelId,
+          model: request.model ?? modelId,
           messages: request.messages,
           temperature: request.temperature,
           maxTokens: request.maxTokens,
@@ -149,12 +151,20 @@ export function useModelRuns() {
 
   /** Starts a fresh set of columns, replacing anything already running. */
   const start = useCallback(
-    (modelIds: string[], request: RunRequest) => {
+    (
+      modelIds: string[],
+      request: RunRequest | ((modelId: string) => RunRequest),
+    ) => {
       for (const controller of controllers.current.values()) controller.abort();
       controllers.current.clear();
       pending.current.clear();
       setRuns(modelIds.map(blankRun));
-      for (const modelId of modelIds) void runOne(modelId, request);
+      for (const modelId of modelIds) {
+        void runOne(
+          modelId,
+          typeof request === "function" ? request(modelId) : request,
+        );
+      }
     },
     [runOne],
   );

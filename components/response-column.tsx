@@ -128,6 +128,8 @@ function Metrics({
 interface ResponseColumnProps {
   run: ColumnRun;
   model: OpenRouterModel | undefined;
+  /** Replaces the model name as the column title. */
+  label?: string;
   onRerun: () => void;
   onCancel: () => void;
   onRemove: () => void;
@@ -139,6 +141,7 @@ interface ResponseColumnProps {
 export function ResponseColumn({
   run,
   model,
+  label,
   onRerun,
   onCancel,
   onRemove,
@@ -227,10 +230,10 @@ export function ResponseColumn({
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-medium">
-              {model?.name ?? run.modelId}
+              {label ?? model?.name ?? run.modelId}
             </div>
             <div className="text-muted-foreground truncate font-mono text-[11px]">
-              {run.modelId}
+              {model?.id ?? run.modelId}
             </div>
           </div>
 
@@ -251,7 +254,7 @@ export function ResponseColumn({
                 <Maximize2 /> Expand
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onRerun}>
-                <RotateCw /> Rerun this model
+                <RotateCw /> Rerun this column
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onCancel} disabled={!active}>
                 <Square /> Cancel
@@ -271,7 +274,7 @@ export function ResponseColumn({
         <DialogContent className="flex h-[85vh] max-w-[min(64rem,calc(100vw-2rem))] flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {model?.name ?? run.modelId}
+              {label ?? model?.name ?? run.modelId}
               <CopyButton text={run.text} size="sm" />
             </DialogTitle>
           </DialogHeader>
