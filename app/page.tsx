@@ -35,7 +35,7 @@ const TOOLS = [
   {
     href: "/experiment",
     icon: FlaskConical,
-    title: "Prompt Experimentation",
+    title: "Prompt Comparison",
     body: "Write 2 to 5 variants of one prompt and run them all on the same model, side by side, to see what each change does.",
   },
   {
