@@ -4,6 +4,7 @@ import {
   type ChatMessage,
   type OpenRouterKeyInfo,
   type OpenRouterModel,
+  type Plugin,
   type TokenUsage,
 } from "./types";
 
@@ -113,6 +114,7 @@ export interface StreamChatOptions {
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
+  plugins?: Plugin[];
   signal?: AbortSignal;
   onDelta: (text: string) => void;
   onUsage?: (usage: TokenUsage) => void;
@@ -135,6 +137,7 @@ export async function streamChatCompletion({
   messages,
   temperature,
   maxTokens,
+  plugins,
   signal,
   onDelta,
   onUsage,
@@ -152,6 +155,7 @@ export async function streamChatCompletion({
         stream_options: { include_usage: true },
         ...(temperature === undefined ? {} : { temperature }),
         ...(maxTokens === undefined ? {} : { max_tokens: maxTokens }),
+        ...(plugins ? { plugins } : {}),
       }),
     });
   } catch (error) {

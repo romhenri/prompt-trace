@@ -39,10 +39,18 @@ export interface TokenUsage {
   total_tokens?: number;
 }
 
+/** A message part; `file` carries a PDF as a data URL for the file-parser plugin. */
+export type ContentPart =
+  | { type: "text"; text: string }
+  | { type: "file"; file: { filename: string; file_data: string } };
+
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
-  content: string;
+  content: string | ContentPart[];
 }
+
+/** Request plugins, e.g. `{ id: "file-parser", pdf: { engine: "cloudflare-ai" } }`. */
+export type Plugin = { id: string } & Record<string, unknown>;
 
 /** Categories we render differently in the UI. */
 export type OpenRouterErrorKind =

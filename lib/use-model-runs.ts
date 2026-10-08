@@ -6,6 +6,7 @@ import {
   OpenRouterError,
   type ChatMessage,
   type OpenRouterErrorKind,
+  type Plugin,
   type TokenUsage,
 } from "./openrouter/types";
 
@@ -31,6 +32,7 @@ export interface RunRequest {
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
+  plugins?: Plugin[];
 }
 
 function blankRun(modelId: string): ColumnRun {
@@ -108,6 +110,7 @@ export function useModelRuns() {
           messages: request.messages,
           temperature: request.temperature,
           maxTokens: request.maxTokens,
+          plugins: request.plugins,
           signal: controller.signal,
           onDelta: (text) => {
             if (firstTokenAt === null) {
