@@ -12,7 +12,7 @@
 The MVP has exactly **two tools**:
 
 1. **Prompt Generator** — user describes what they want; the app writes a well-structured prompt for them.
-2. **Prompt Comparison** — user writes one prompt, picks N models, and sees every model's answer side by side.
+2. **Model Comparison** — user writes one prompt, picks N models, and sees every model's answer side by side.
 
 Anything not listed in this spec is out of scope. Do not add extra tools, auth, billing, or a database.
 
@@ -101,7 +101,7 @@ Content-Type: application/json
 
 ---
 
-## 7. Tool 2 — Prompt Comparison
+## 7. Tool 2 — Model Comparison
 
 **Route:** `/compare`
 

@@ -29,7 +29,7 @@ const TOOLS = [
   {
     href: "/compare",
     icon: Columns3,
-    title: "Prompt Comparison",
+    title: "Model Comparison",
     body: "Run one prompt across 2 to 6 models at once, streaming side by side, with latency, tokens and estimated cost per column.",
   },
   {

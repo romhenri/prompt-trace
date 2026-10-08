@@ -29,7 +29,7 @@ function metricsLine(
 }
 
 export function toMarkdown(data: ComparisonExport): string {
-  const lines: string[] = ["# Prompt comparison", ""];
+  const lines: string[] = ["# Model comparison", ""];
 
   if (data.systemPrompt.trim()) {
     lines.push("## System prompt", "", "```text", data.systemPrompt, "```", "");
