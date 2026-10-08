@@ -1,13 +1,19 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Play, RotateCw, Square } from "lucide-react";
+import { FileText, Play, RotateCw, Square, X } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { ModelPicker } from "@/components/model-picker";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { ResponseColumn } from "@/components/response-column";
 import { Button } from "@/components/ui/button";
-import { buildAtsPrompt, consensus, parseVerdict } from "@/lib/ats";
+import {
+  PDF_PLUGINS,
+  buildAtsMessages,
+  consensus,
+  parseVerdict,
+  type ResumePdf,
+} from "@/lib/ats";
 import { PAGE_CONTAINER } from "@/lib/layout";
 import { useModelCatalog } from "@/lib/openrouter/models";
 import { useModelRuns, type RunRequest } from "@/lib/use-model-runs";
@@ -15,6 +21,8 @@ import { useAppStore } from "@/store/app-store";
 
 const MIN_MODELS = 2;
 const MAX_MODELS = 6;
+/** The PDF travels base64-encoded inside every request, once per model. */
+const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
 export default function AtsPage() {
   return (
@@ -33,6 +41,8 @@ function Ats() {
 
   const [resume, setResume] = useState("");
   const [job, setJob] = useState("");
+  const [pdf, setPdf] = useState<ResumePdf | null>(null);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const [models, setModels] = useState<string[]>(() =>
     favorites.slice(0, MIN_MODELS),
   );
@@ -44,7 +54,7 @@ function Ats() {
   const scored = useRef<RunRequest | null>(null);
 
   const canRun =
-    resume.trim() !== "" &&
+    (pdf !== null || resume.trim() !== "") &&
     models.length >= MIN_MODELS &&
     models.length <= MAX_MODELS;
 
@@ -53,11 +63,24 @@ function Ats() {
     if (!apiKey) return null;
     return {
       apiKey,
-      messages: [
-        { role: "user" as const, content: buildAtsPrompt(resume, job) },
-      ],
+      messages: buildAtsMessages(resume, job, pdf),
+      plugins: pdf ? PDF_PLUGINS : undefined,
       temperature: 0,
     };
+  }
+
+  function attachPdf(file: File | undefined) {
+    setPdfError(null);
+    if (!file) return;
+    if (file.size > MAX_PDF_BYTES) {
+      setPdfError("That PDF is over 10 MB. Export a smaller one.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () =>
+      setPdf({ filename: file.name, dataUrl: String(reader.result) });
+    reader.onerror = () => setPdfError("Could not read that file.");
+    reader.readAsDataURL(file);
   }
 
   function run() {
@@ -96,16 +119,53 @@ function Ats() {
   return (
     <main className={`flex-1 space-y-4 py-6 ${PAGE_CONTAINER}`}>
       <div className="space-y-3 rounded-xl border p-4">
-        <PromptTextarea
-          label="Resume"
-          required
-          value={resume}
-          onChange={setResume}
-          onSubmit={run}
-          rows={12}
-          placeholder="Paste the full resume text here."
-          hint="Sent straight from your browser to each model. Strip anything you would not want a model to see."
-        />
+        {pdf ? (
+          <div className="space-y-1.5">
+            <span className="text-sm font-medium">Resume</span>
+            <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+              <FileText className="text-muted-foreground size-4 shrink-0" />
+              <span className="min-w-0 flex-1 truncate">{pdf.filename}</span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setPdf(null)}
+                aria-label="Remove PDF"
+              >
+                <X />
+              </Button>
+            </div>
+            <p className="text-muted-foreground text-xs">
+              OpenRouter extracts the text with its free file-parser plugin, so
+              every model grades the same text.
+            </p>
+          </div>
+        ) : (
+          <PromptTextarea
+            label="Resume"
+            required
+            value={resume}
+            onChange={setResume}
+            onSubmit={run}
+            rows={12}
+            placeholder="Paste the full resume text here, or attach a PDF below."
+            hint="Sent straight from your browser to each model. Strip anything you would not want a model to see."
+          />
+        )}
+        {!pdf && (
+          <label className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+            Or attach a PDF
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => {
+                attachPdf(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+              className="file:bg-muted file:text-foreground text-xs file:mr-2 file:rounded-md file:border-0 file:px-2 file:py-1"
+            />
+          </label>
+        )}
+        {pdfError && <p className="text-sm text-red-500">{pdfError}</p>}
         <PromptTextarea
           label="Job description"
           value={job}

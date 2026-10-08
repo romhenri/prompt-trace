@@ -1,5 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { buildAtsPrompt, consensus, parseVerdict } from "./ats";
+import {
+  buildAtsMessages,
+  buildAtsPrompt,
+  consensus,
+  parseVerdict,
+} from "./ats";
+
+describe("buildAtsMessages", () => {
+  it("sends plain text when no PDF is attached", () => {
+    const [message] = buildAtsMessages("resume text", "", null);
+    expect(message.content).toContain("resume text");
+  });
+
+  it("sends the PDF as a file part instead of the pasted text", () => {
+    const [message] = buildAtsMessages("ignored", "", {
+      filename: "cv.pdf",
+      dataUrl: "data:application/pdf;base64,AAAA",
+    });
+    expect(message.content).toEqual([
+      {
+        type: "text",
+        text: expect.stringContaining("The resume is the attached PDF."),
+      },
+      {
+        type: "file",
+        file: {
+          filename: "cv.pdf",
+          file_data: "data:application/pdf;base64,AAAA",
+        },
+      },
+    ]);
+  });
+});
 
 describe("buildAtsPrompt", () => {
   it("includes the job description when given one", () => {
