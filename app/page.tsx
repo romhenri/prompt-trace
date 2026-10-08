@@ -21,12 +21,6 @@ import { useAppStore } from "@/store/app-store";
 
 const TOOLS = [
   {
-    href: "/generate",
-    icon: Sparkles,
-    title: "Prompt Generator",
-    body: "Describe the job. Get back a structured, production-ready prompt you can copy or send straight to a comparison.",
-  },
-  {
     href: "/compare",
     icon: Columns3,
     title: "Model Comparison",
@@ -37,6 +31,12 @@ const TOOLS = [
     icon: FlaskConical,
     title: "Prompt Comparison",
     body: "Write 2 to 5 variants of one prompt and run them all on the same model, side by side, to see what each change does.",
+  },
+  {
+    href: "/generate",
+    icon: Sparkles,
+    title: "Prompt Generator",
+    body: "Describe the job. Get back a structured, production-ready prompt you can copy or send straight to a comparison.",
   },
   {
     href: "/ats",
