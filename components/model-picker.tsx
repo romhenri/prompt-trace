@@ -247,12 +247,18 @@ export function ModelPicker(props: ModelPickerProps) {
                   <Skeleton className="h-8 w-full" />
                   <Skeleton className="h-8 w-full" />
                 </div>
-              ) : error ? (
+              ) : error && models.length === 0 ? (
                 <div className="p-4 text-sm">
                   <p className="text-destructive">{error}</p>
                   <Button
                     variant="outline"
                     size="sm"
+          {error && models.length > 0 && (
+            <p className="text-destructive border-b px-3 py-2 text-xs">
+              {error} Use the refresh button to retry.
+            </p>
+          )}
+
                     className="mt-2"
                     onClick={refresh}
                   >
