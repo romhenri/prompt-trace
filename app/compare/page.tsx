@@ -34,7 +34,7 @@ import { PAGE_CONTAINER } from "@/lib/layout";
 import { useAppStore } from "@/store/app-store";
 import { toast } from "sonner";
 
-export const MIN_MODELS = 2;
+export const MIN_MODELS = 1;
 export const MAX_MODELS = 6;
 
 export default function ComparePage() {
@@ -59,7 +59,7 @@ function Compare() {
 
   const [userPrompt, setUserPrompt] = useState(preset?.userPrompt ?? "");
   const [models, setModels] = useState<string[]>(
-    () => preset?.models ?? favorites.slice(0, MIN_MODELS),
+    () => preset?.models ?? favorites.slice(0, 2),
   );
   const [temperature, setTemperature] = useState(preset?.temperature ?? "1");
   const [maxTokens, setMaxTokens] = useState(preset?.maxTokens ?? "");
@@ -245,11 +245,11 @@ function Compare() {
               value={models}
               onChange={changeModels}
               max={MAX_MODELS}
-              placeholder="Pick 2 to 6 models"
+              placeholder="Pick 1 to 6 models"
             />
             {models.length < MIN_MODELS && (
               <p className="text-muted-foreground text-xs">
-                Pick at least {MIN_MODELS} models to compare.
+                Pick at least {MIN_MODELS} model to run.
               </p>
             )}
           </div>

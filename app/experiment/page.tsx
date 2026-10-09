@@ -17,7 +17,7 @@ import type { ChatMessage } from "@/lib/openrouter/types";
 import { useModelRuns, type RunRequest } from "@/lib/use-model-runs";
 import { useAppStore } from "@/store/app-store";
 
-const MIN_VARIANTS = 2;
+const MIN_VARIANTS = 1;
 const MAX_VARIANTS = 5;
 
 /** Column key per variant; the hook keys runs by it. */
@@ -203,7 +203,7 @@ function Experiment() {
 
       {runs.length === 0 ? (
         <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center text-sm">
-          Write 2 to 5 versions of a prompt, pick one model, and see what each
+          Write 1 to 5 versions of a prompt, pick one model, and see what each
           change does to the answer.
         </div>
       ) : (
