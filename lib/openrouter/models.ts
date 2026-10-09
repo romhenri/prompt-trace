@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { STORAGE_KEYS, readJson, writeJson } from "../storage";
 import { fetchModels } from "./client";
+import { FALLBACK_MODELS } from "./fallback-models";
 import type { OpenRouterModel } from "./types";
 
 const TTL_MS = 24 * 60 * 60 * 1000;
@@ -56,6 +57,22 @@ export async function loadModels(force = false): Promise<OpenRouterModel[]> {
   return inFlight;
 }
 
+export interface FallbackCatalog {
+  models: OpenRouterModel[];
+  source: "cache" | "bundled";
+}
+
+/**
+ * What to show when the network fails: the last catalog we saw, however old
+ * (prices and ids are real), else a short bundled list.
+ */
+export function fallbackCatalog(stored: CachedCatalog | null): FallbackCatalog {
+  if (stored && Array.isArray(stored.models) && stored.models.length > 0) {
+    return { models: stored.models, source: "cache" };
+  }
+  return { models: [...FALLBACK_MODELS], source: "bundled" };
+}
+
 /** Provider slug from the id prefix, e.g. `anthropic/claude-…` -> `anthropic`. */
 export function providerOf(modelId: string): string {
   const slash = modelId.indexOf("/");
@@ -86,10 +103,20 @@ export function useModelCatalog(): ModelCatalog {
       })
       .catch((cause: unknown) => {
         if (!live) return;
-        setError(
+        const reason =
           cause instanceof Error
             ? cause.message
-            : "Could not load the model catalog.",
+            : "Could not load the model catalog.";
+        const fallback = fallbackCatalog(
+          readJson<CachedCatalog | null>(STORAGE_KEYS.models, null),
+        );
+        setModels(fallback.models);
+        setError(
+          `${reason}. Showing ${
+            fallback.source === "cache"
+              ? "your last saved list"
+              : "a short built-in list"
+          }.`,
         );
       })
       .finally(() => {
