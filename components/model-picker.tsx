@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   Check,
   ChevronsUpDown,
+  Gem,
   RefreshCw,
   Star,
   Tag,
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFreeModel, pricePerMillion } from "@/lib/cost";
+import { resolveCuratedIds } from "@/lib/curated-models";
 import { providerOf, useModelCatalog } from "@/lib/openrouter/models";
 import type { OpenRouterModel } from "@/lib/openrouter/types";
 import { cn } from "@/lib/utils";
@@ -106,6 +108,7 @@ export function ModelPicker(props: ModelPickerProps) {
   const [query, setQuery] = useState("");
   const [provider, setProvider] = useState(ALL_PROVIDERS);
   const [freeOnly, setFreeOnly] = useState(false);
+  const [curatedOnly, setCuratedOnly] = useState(false);
 
   const selected = props.mode === "single" ? props.value : null;
   const selectedMany = props.mode === "multi" ? props.value : [];
@@ -119,6 +122,11 @@ export function ModelPicker(props: ModelPickerProps) {
     [models],
   );
 
+  const curatedIds = useMemo(
+    () => new Set(resolveCuratedIds(models)),
+    [models],
+  );
+
   const { visible, matchCount } = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const matches = models.filter((model) => {
@@ -126,6 +134,7 @@ export function ModelPicker(props: ModelPickerProps) {
         return false;
       }
       if (freeOnly && !isFreeModel(model)) return false;
+      if (curatedOnly && !curatedIds.has(model.id)) return false;
       if (!needle) return true;
       return (
         model.id.toLowerCase().includes(needle) ||
@@ -140,7 +149,7 @@ export function ModelPicker(props: ModelPickerProps) {
       return byStar !== 0 ? byStar : a.name.localeCompare(b.name);
     });
     return { visible: sorted.slice(0, MAX_VISIBLE), matchCount: sorted.length };
-  }, [models, query, provider, freeOnly, favorites]);
+  }, [models, query, provider, freeOnly, curatedOnly, curatedIds, favorites]);
 
   function isSelected(modelId: string) {
     return props.mode === "single"
@@ -211,6 +220,17 @@ export function ModelPicker(props: ModelPickerProps) {
               </SelectContent>
             </Select>
             <Button
+              variant={curatedOnly ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setCuratedOnly((on) => !on)}
+              aria-pressed={curatedOnly}
+              title="Show only the hand-picked favourites"
+              className="shrink-0"
+            >
+              <Gem className={cn(curatedOnly && "text-orange-400")} />
+              Curated
+            </Button>
+            <Button
               variant={freeOnly ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setFreeOnly((on) => !on)}
@@ -233,6 +253,12 @@ export function ModelPicker(props: ModelPickerProps) {
             </Button>
           </div>
 
+          {error && models.length > 0 && (
+            <p className="text-destructive border-b px-3 py-2 text-xs">
+              {error} Use the refresh button to retry.
+            </p>
+          )}
+
           {/* Filtering is ours so we can pin favourites and cap the list. */}
           <Command shouldFilter={false}>
             <CommandInput
@@ -253,12 +279,6 @@ export function ModelPicker(props: ModelPickerProps) {
                   <Button
                     variant="outline"
                     size="sm"
-          {error && models.length > 0 && (
-            <p className="text-destructive border-b px-3 py-2 text-xs">
-              {error} Use the refresh button to retry.
-            </p>
-          )}
-
                     className="mt-2"
                     onClick={refresh}
                   >
