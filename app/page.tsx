@@ -6,6 +6,7 @@ import {
   Columns3,
   FileUser,
   FlaskConical,
+  WandSparkles,
   MessagesSquare,
   Thermometer,
   Gavel,
@@ -101,6 +102,21 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      <Link
+        href="/prompted"
+        className="from-orange-400/10 hover:border-orange-400/50 focus-visible:ring-ring group mt-5 flex items-center gap-4 rounded-xl border border-dashed bg-gradient-to-r to-transparent p-5 transition-colors focus-visible:ring-3 focus-visible:outline-none"
+      >
+        <WandSparkles className="size-6 shrink-0 text-orange-400" />
+        <div className="min-w-0 flex-1">
+          <h2 className="font-medium">Prompted</h2>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            A different kind of service: the prompt is already written. Pick
+            one, bring your input and run.
+          </p>
+        </div>
+        <ArrowRight className="size-4 shrink-0 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+      </Link>
 
       <section className="mt-10 rounded-xl border p-6">
         {!hydrated ? (
