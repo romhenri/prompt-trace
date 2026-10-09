@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Square } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
+import { RenderableText } from "@/components/markdown";
 import { ModelPicker } from "@/components/model-picker";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { Button } from "@/components/ui/button";
@@ -215,8 +216,8 @@ function Judge() {
 
       {attempts.length === 0 ? (
         <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center text-sm">
-          Set a task and a requirement, and the challenger keeps rewriting
-          until the judge is satisfied.
+          Set a task and a requirement, and the challenger keeps rewriting until
+          the judge is satisfied.
         </div>
       ) : (
         <>
@@ -247,9 +248,7 @@ function Judge() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm whitespace-pre-wrap">
-                  {attempt.text || "…"}
-                </p>
+                <RenderableText text={attempt.text} placeholder="…" />
                 {attempt.judgment?.feedback && (
                   <p className="text-muted-foreground mt-2 border-t pt-2 text-xs">
                     Judge: {attempt.judgment.feedback}
