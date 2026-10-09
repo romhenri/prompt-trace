@@ -5,6 +5,8 @@ import { Play, Square } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { RenderableText } from "@/components/markdown";
 import { ModelPicker } from "@/components/model-picker";
+import { VerbosityPicker } from "@/components/verbosity-picker";
+import { withVerbosity, type VerbosityId } from "@/lib/verbosity";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +37,8 @@ function Temperature() {
   const favorites = useAppStore((s) => s.favorites);
 
   const [prompt, setPrompt] = useState("");
+  const [verbosity, setVerbosity] = useState<VerbosityId | null>(null);
+
   const [model, setModel] = useState<string | null>(favorites[0] ?? null);
   const [raw, setRaw] = useState("0, 0.7, 1.4");
   const [samples, setSamples] = useState<Sample[]>([]);
@@ -63,7 +67,7 @@ function Temperature() {
       await streamChatCompletion({
         apiKey: apiKey!,
         model: model!,
-        messages: [{ role: "user", content: prompt }],
+        messages: withVerbosity([{ role: "user", content: prompt }], verbosity),
         temperature,
         signal,
         onDelta: (delta) => patch(index, (s) => ({ text: s.text + delta })),
@@ -134,6 +138,12 @@ function Temperature() {
             />
           </div>
         </div>
+
+        <VerbosityPicker
+          service="temperature"
+          value={verbosity}
+          onChange={setVerbosity}
+        />
 
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <Button onClick={run} disabled={!canRun || busy}>
