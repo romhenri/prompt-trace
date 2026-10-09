@@ -11,6 +11,7 @@ import {
   Square,
   Trash2,
 } from "lucide-react";
+import { Markdown, MarkdownToggle } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -149,6 +150,7 @@ export function ResponseColumn({
   scrollRatio,
 }: ResponseColumnProps) {
   const [expanded, setExpanded] = useState(false);
+  const [rendered, setRendered] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const applyingRemote = useRef(false);
 
@@ -198,6 +200,8 @@ export function ResponseColumn({
             <RotateCw /> Retry
           </Button>
         </div>
+      ) : run.text && rendered ? (
+        <Markdown>{run.text}</Markdown>
       ) : run.text ? (
         <pre className="font-mono text-[13px] leading-relaxed whitespace-pre-wrap">
           {run.text}
@@ -237,6 +241,10 @@ export function ResponseColumn({
             </div>
           </div>
 
+          <MarkdownToggle
+            pressed={rendered}
+            onToggle={() => setRendered((value) => !value)}
+          />
           <CopyButton text={run.text} />
 
           <DropdownMenu>
@@ -275,13 +283,21 @@ export function ResponseColumn({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {label ?? model?.name ?? run.modelId}
+              <MarkdownToggle
+                pressed={rendered}
+                onToggle={() => setRendered((value) => !value)}
+              />
               <CopyButton text={run.text} size="sm" />
             </DialogTitle>
           </DialogHeader>
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <pre className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
-              {run.text || "No output."}
-            </pre>
+            {run.text && rendered ? (
+              <Markdown>{run.text}</Markdown>
+            ) : (
+              <pre className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
+                {run.text || "No output."}
+              </pre>
+            )}
           </div>
           <Metrics run={run} model={model} />
         </DialogContent>

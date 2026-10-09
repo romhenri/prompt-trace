@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Square } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
+import { RenderableText } from "@/components/markdown";
 import { ModelPicker } from "@/components/model-picker";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { Button } from "@/components/ui/button";
@@ -170,9 +171,10 @@ function Temperature() {
                   </span>
                 )}
               </div>
-              <p className="text-sm whitespace-pre-wrap">
-                {s.text || (s.running ? "…" : "")}
-              </p>
+              <RenderableText
+                text={s.text}
+                placeholder={s.running ? "…" : ""}
+              />
               {s.error && <p className="text-sm text-red-500">{s.error}</p>}
             </section>
           ))}

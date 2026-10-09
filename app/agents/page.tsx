@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Plus, Square, X } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
+import { RenderableText } from "@/components/markdown";
 import { ModelPicker } from "@/components/model-picker";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { Button } from "@/components/ui/button";
@@ -234,7 +235,7 @@ function Agents() {
                   {people[turn.speaker]?.modelId}
                 </span>
               </div>
-              <p className="text-sm whitespace-pre-wrap">{turn.text || "…"}</p>
+              <RenderableText text={turn.text} placeholder="…" />
             </li>
           ))}
         </ul>
