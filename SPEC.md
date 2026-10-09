@@ -108,7 +108,7 @@ Content-Type: application/json
 **Inputs:**
 - `systemPrompt` (optional textarea, collapsible).
 - `userPrompt` (required textarea).
-- `models`: multi-select, **2 to 6** models.
+- `models`: multi-select, **1 to 6** models.
 - Advanced (collapsible): `temperature` (default 1), `max_tokens` (default empty = provider default). Same params applied to every model so the comparison is fair.
 
 **Behavior:**

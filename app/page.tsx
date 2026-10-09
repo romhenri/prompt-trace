@@ -24,13 +24,13 @@ const TOOLS = [
     href: "/compare",
     icon: Columns3,
     title: "Model Comparison",
-    body: "Run one prompt across 2 to 6 models at once, streaming side by side, with latency, tokens and estimated cost per column.",
+    body: "Run one prompt across 1 to 6 models at once, streaming side by side, with latency, tokens and estimated cost per column.",
   },
   {
     href: "/experiment",
     icon: FlaskConical,
     title: "Prompt Comparison",
-    body: "Write 2 to 5 variants of one prompt and run them all on the same model, side by side, to see what each change does.",
+    body: "Write 1 to 5 variants of one prompt and run them all on the same model, side by side, to see what each change does.",
   },
   {
     href: "/generate",

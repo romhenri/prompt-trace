@@ -3,7 +3,7 @@
 Two small tools for working with LLM prompts:
 
 - **`/generate`**: describe a task, get back a structured, production-ready prompt.
-- **`/compare`**: run one prompt across 2 to 6 models at once, streaming side by side.
+- **`/compare`**: run one prompt across 1 to 6 models at once, streaming side by side.
 
 ## No backend
 
