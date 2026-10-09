@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ChevronDown, Play, Plus, RotateCw, Square, X } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { ModelPicker } from "@/components/model-picker";
+import { VerbosityPicker } from "@/components/verbosity-picker";
+import { withVerbosity, type VerbosityId } from "@/lib/verbosity";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { ResponseColumn } from "@/components/response-column";
 import { Button } from "@/components/ui/button";
@@ -38,6 +40,8 @@ function Experiment() {
 
   const [model, setModel] = useState<string | null>(favorites[0] ?? null);
   const [systemPrompt, setSystemPrompt] = useState("");
+  const [verbosity, setVerbosity] = useState<VerbosityId | null>(null);
+
   const [showSystem, setShowSystem] = useState(false);
   const [variants, setVariants] = useState<string[]>(["", ""]);
   const [temperature, setTemperature] = useState("1");
@@ -71,7 +75,7 @@ function Experiment() {
       next[key(i)] = {
         apiKey,
         model,
-        messages,
+        messages: withVerbosity(messages, verbosity),
         temperature: parsedTemperature,
       };
     });
@@ -171,6 +175,12 @@ function Experiment() {
               changes. Use 0 to cut out sampling noise.
             </p>
           </div>
+
+          <VerbosityPicker
+            service="experiment"
+            value={verbosity}
+            onChange={setVerbosity}
+          />
 
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <Button onClick={run} disabled={!canRun || busy}>

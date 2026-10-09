@@ -5,6 +5,8 @@ import { Play, Plus, Square, X } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { RenderableText } from "@/components/markdown";
 import { ModelPicker } from "@/components/model-picker";
+import { VerbosityPicker } from "@/components/verbosity-picker";
+import { withVerbosity, type VerbosityId } from "@/lib/verbosity";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +41,7 @@ function Agents() {
   const favorites = useAppStore((s) => s.favorites);
 
   const [topic, setTopic] = useState("");
+  const [verbosity, setVerbosity] = useState<VerbosityId | null>(null);
   const [rounds, setRounds] = useState(3);
   const [people, setPeople] = useState<Participant[]>(() =>
     PRESETS[0].roles
@@ -86,7 +89,10 @@ function Agents() {
         await streamChatCompletion({
           apiKey,
           model: people[speaker].modelId!,
-          messages: buildTurnMessages(topic, people, transcript, speaker),
+          messages: withVerbosity(
+            buildTurnMessages(topic, people, transcript, speaker),
+            verbosity,
+          ),
           signal: abort.signal,
           onDelta: (delta) => {
             turn.text += delta;
@@ -203,6 +209,12 @@ function Agents() {
             {calls} model calls, each with a longer transcript than the last.
           </p>
         </div>
+
+        <VerbosityPicker
+          service="agents"
+          value={verbosity}
+          onChange={setVerbosity}
+        />
 
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <Button onClick={run} disabled={!canRun || running}>

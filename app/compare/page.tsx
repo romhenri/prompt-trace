@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { KeyGate } from "@/components/key-gate";
 import { ModelPicker } from "@/components/model-picker";
+import { VerbosityPicker } from "@/components/verbosity-picker";
+import { withVerbosity, type VerbosityId } from "@/lib/verbosity";
 import { PromptTextarea } from "@/components/prompt-textarea";
 import { ResponseColumn } from "@/components/response-column";
 import { Button } from "@/components/ui/button";
@@ -53,6 +55,8 @@ function Compare() {
     useModelRuns();
 
   const [systemPrompt, setSystemPrompt] = useState(preset?.systemPrompt ?? "");
+  const [verbosity, setVerbosity] = useState<VerbosityId | null>(null);
+
   const [userPrompt, setUserPrompt] = useState(preset?.userPrompt ?? "");
   const [models, setModels] = useState<string[]>(
     () => preset?.models ?? favorites.slice(0, MIN_MODELS),
@@ -111,7 +115,7 @@ function Compare() {
     messages.push({ role: "user", content: userPrompt });
     return {
       apiKey,
-      messages,
+      messages: withVerbosity(messages, verbosity),
       temperature: parsedTemperature,
       maxTokens: parsedMaxTokens ?? undefined,
     };
@@ -286,6 +290,12 @@ function Compare() {
               </p>
             </div>
           )}
+
+          <VerbosityPicker
+            service="compare"
+            value={verbosity}
+            onChange={setVerbosity}
+          />
 
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <Button onClick={run} disabled={!canRun || busy}>
